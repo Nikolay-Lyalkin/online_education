@@ -6,6 +6,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
     steps:
     - name: Check out code
       uses: actions/checkout@v3
@@ -21,14 +24,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        poetry install
-
-    - name: Run migrations
-      run: |
-        poetry run python manage.py migrate
+        cd online_education
+        poetry install --no-root
 
     - name: Run tests
       run: |
+        cd online_education
         poetry run python manage.py test
         
 
@@ -65,5 +66,5 @@ jobs:
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
             docker stop myapp || true
             docker rm myapp || true
-            docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+            docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/online_education:${{ github.sha }}
           EOF
